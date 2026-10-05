@@ -106,4 +106,27 @@ final class CategoryRepository implements CategoryRepositoryInterface
 
         return $result;
     }
+
+    /**
+     * @return list<array{slug: string, lastmod: string}>
+     */
+    public function listAllForSitemap(): array
+    {
+        $stmt = $this->pdo->query(
+            'SELECT slug, updated_at AS lastmod
+             FROM categories
+             ORDER BY name ASC'
+        );
+
+        $rows = $stmt->fetchAll();
+        $result = [];
+        foreach ($rows as $row) {
+            $result[] = [
+                'slug' => (string) $row['slug'],
+                'lastmod' => (string) $row['lastmod'],
+            ];
+        }
+
+        return $result;
+    }
 }

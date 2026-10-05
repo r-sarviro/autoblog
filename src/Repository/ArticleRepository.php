@@ -134,4 +134,27 @@ final class ArticleRepository implements ArticleRepositoryInterface
         );
         $stmt->execute(['id' => $articleId]);
     }
+
+    /**
+     * @return list<array{slug: string, lastmod: string}>
+     */
+    public function listAllForSitemap(): array
+    {
+        $stmt = $this->pdo->query(
+            'SELECT slug, COALESCE(updated_at, published_at) AS lastmod
+             FROM articles
+             ORDER BY published_at DESC, id DESC'
+        );
+
+        $rows = $stmt->fetchAll();
+        $result = [];
+        foreach ($rows as $row) {
+            $result[] = [
+                'slug' => (string) $row['slug'],
+                'lastmod' => (string) $row['lastmod'],
+            ];
+        }
+
+        return $result;
+    }
 }

@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="{$page_description|default:'Автомобильный блог: обзоры, новости и практические советы.'}">
+    {if isset($robots) && $robots != ''}
+    <meta name="robots" content="{$robots|escape:'html'}">
+    {/if}
     <meta name="theme-color" content="#0d1217">
     <title>{$page_title|default:'Блог'} — {$app_name}</title>
     <link rel="icon" href="/favicon.svg" type="image/svg+xml">
@@ -11,6 +14,26 @@
     <link rel="apple-touch-icon" href="/apple-touch-icon.png">
     {if isset($canonical_url) && $canonical_url != ''}
     <link rel="canonical" href="{$canonical_url|escape:'html'}">
+    {/if}
+    {if isset($og)}
+    <meta property="og:type" content="{$og.type|escape:'html'}">
+    <meta property="og:title" content="{$og.title|escape:'html'}">
+    <meta property="og:description" content="{$og.description|escape:'html'}">
+    <meta property="og:url" content="{$og.url|escape:'html'}">
+    <meta property="og:image" content="{$og.image|escape:'html'}">
+    <meta property="og:locale" content="{$og.locale|default:'ru_RU'|escape:'html'}">
+    <meta property="og:site_name" content="{$og.site_name|escape:'html'}">
+    {/if}
+    {if isset($twitter)}
+    <meta name="twitter:card" content="{$twitter.card|escape:'html'}">
+    <meta name="twitter:title" content="{$twitter.title|escape:'html'}">
+    <meta name="twitter:description" content="{$twitter.description|escape:'html'}">
+    <meta name="twitter:image" content="{$twitter.image|escape:'html'}">
+    {/if}
+    {if isset($json_ld)}
+        {foreach from=$json_ld item=schema_json}
+    <script type="application/ld+json">{$schema_json nofilter}</script>
+        {/foreach}
     {/if}
     <script>
         (function () {

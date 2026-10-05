@@ -20,4 +20,9 @@ interface CategoryRepositoryInterface
      * @return list<array{category: array<string, mixed>, articles: list<array<string, mixed>>}>
      */
     public function listWithLatestArticles(int $articlesPerCategory = 3): array;
+
+    /**
+     * @return list<array{slug: string, lastmod: string}>
+     */
+    public function listAllForSitemap(): array;
 }

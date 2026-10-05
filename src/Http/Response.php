@@ -6,6 +6,7 @@ namespace App\Http;
 
 use App\Config\Config;
 use App\Repository\CategoryRepositoryInterface;
+use App\Support\SeoMeta;
 use App\View\SmartyView;
 use Throwable;
 
@@ -32,11 +33,10 @@ final class Response
 
     public function notFound(string $message = 'Страница не найдена'): void
     {
-        $this->html('404.tpl', [
-            'page_title' => '404',
-            'page_description' => 'Запрошенная страница не найдена.',
-            'message' => $message,
-        ], 404);
+        $this->html('404.tpl', array_merge(
+            SeoMeta::error('404', 'Запрошенная страница не найдена.'),
+            ['message' => $message]
+        ), 404);
     }
 
     public function serverError(Throwable $throwable): void
@@ -45,10 +45,9 @@ final class Response
             ? $throwable->getMessage()
             : 'Произошла внутренняя ошибка. Попробуйте позже.';
 
-        $this->html('500.tpl', [
-            'page_title' => 'Ошибка',
-            'page_description' => 'Внутренняя ошибка сервера.',
-            'message' => $message,
-        ], 500);
+        $this->html('500.tpl', array_merge(
+            SeoMeta::error('Ошибка', 'Внутренняя ошибка сервера.'),
+            ['message' => $message]
+        ), 500);
     }
 }

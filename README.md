@@ -8,6 +8,7 @@
 - страница категории с сортировкой (дата / просмотры) и пагинацией;
 - страница статьи со счётчиком просмотров и похожими материалами;
 - связь статей и категорий many-to-many;
+- базовое SEO (title/description, canonical, Open Graph, Twitter Cards, JSON-LD, robots, sitemap);
 - сидинг демо-данных;
 - unit-тесты на PHPUnit.
 
@@ -76,8 +77,22 @@ php -S localhost:8000 -t public
 | Главная   | `/`                                                   |
 | Категория | `/category.php?slug=news&sort=date&page=1`            |
 | Статья    | `/article.php?slug=russian-car-market-september-2025` |
+| robots    | `/robots.php` (в Docker также `/robots.txt`)          |
+| sitemap   | `/sitemap.php`                                        |
 
 Допустимые значения `sort`: `date` (по умолчанию), `views`.
+
+## SEO
+
+Базовые мета-теги собираются в `App\Support\SeoMeta` из существующих полей (`title`, `description`, `image`) без отдельных SEO-колонок в БД:
+
+- `<title>`, `<meta name="description">`, `canonical`;
+- Open Graph и Twitter Cards;
+- JSON-LD: `WebSite` (главная), `CollectionPage` (категория), `Article` + `BreadcrumbList` (статья);
+- 404/500 отдаются с `noindex,nofollow`;
+- `robots.php` и `sitemap.php` строят абсолютные URL из `APP_URL`.
+
+Для корректных canonical/OG/sitemap задайте в `.env` публичный адрес сайта (`APP_URL`).
 
 ## Тесты
 
@@ -117,4 +132,6 @@ docker/          PHP и Nginx конфиги
 - [ ] Блок похожих статей не содержит текущую
 - [ ] Несуществующие slug возвращают 404
 - [ ] Некорректные `page` / `sort` не ломают страницу
+- [ ] В `<head>` есть description, canonical, Open Graph и JSON-LD
+- [ ] `/robots.php` и `/sitemap.php` отдают корректные ответы
 - [ ] `composer test` проходит успешно

@@ -30,4 +30,9 @@ interface ArticleRepositoryInterface
     public function relatedBySharedCategories(int $articleId, int $limit = 3): array;
 
     public function incrementViews(int $articleId): void;
+
+    /**
+     * @return list<array{slug: string, lastmod: string}>
+     */
+    public function listAllForSitemap(): array;
 }
