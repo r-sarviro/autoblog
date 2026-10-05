@@ -71,11 +71,11 @@ php -S localhost:8000 -t public
 
 ## URL
 
-| Страница | Пример |
-|----------|--------|
-| Главная | `/` |
-| Категория | `/category.php?slug=news&sort=date&page=1` |
-| Статья | `/article.php?slug=russian-car-market-september-2025` |
+| Страница  | Пример                                                |
+| --------- | ----------------------------------------------------- |
+| Главная   | `/`                                                   |
+| Категория | `/category.php?slug=news&sort=date&page=1`            |
+| Статья    | `/article.php?slug=russian-car-market-september-2025` |
 
 Допустимые значения `sort`: `date` (по умолчанию), `views`.
 
