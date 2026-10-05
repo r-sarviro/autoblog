@@ -4,7 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="{$page_description|default:'Автомобильный блог: обзоры, новости и практические советы.'}">
+    <meta name="theme-color" content="#0d1217">
     <title>{$page_title|default:'Блог'} — {$app_name}</title>
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+    <link rel="icon" href="/favicon.ico" sizes="any">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
     {if isset($canonical_url) && $canonical_url != ''}
     <link rel="canonical" href="{$canonical_url|escape:'html'}">
     {/if}
