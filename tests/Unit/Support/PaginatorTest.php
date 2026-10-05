@@ -43,4 +43,23 @@ final class PaginatorTest extends TestCase
         self::assertFalse($paginator->hasPrevious());
         self::assertFalse($paginator->hasNext());
     }
+
+    public function testPagesWithoutEllipsisForShortRanges(): void
+    {
+        $paginator = Paginator::fromRequest(2, 12, 36); // 3 pages
+
+        self::assertSame([1, 2, 3], $paginator->pages());
+    }
+
+    public function testPagesUsesEllipsisForLongRanges(): void
+    {
+        $middle = Paginator::fromRequest(5, 10, 100); // 10 pages
+        self::assertSame([1, 'ellipsis', 4, 5, 6, 'ellipsis', 10], $middle->pages());
+
+        $start = Paginator::fromRequest(1, 10, 100);
+        self::assertSame([1, 2, 'ellipsis', 10], $start->pages());
+
+        $end = Paginator::fromRequest(10, 10, 100);
+        self::assertSame([1, 'ellipsis', 9, 10], $end->pages());
+    }
 }

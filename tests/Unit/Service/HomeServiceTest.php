@@ -4,14 +4,20 @@ declare(strict_types=1);
 
 namespace Tests\Unit\Service;
 
+use App\Repository\ArticleRepositoryInterface;
 use App\Repository\CategoryRepositoryInterface;
 use App\Service\HomeService;
 use PHPUnit\Framework\TestCase;
 
 final class HomeServiceTest extends TestCase
 {
-    public function testReturnsSectionsFromRepository(): void
+    public function testReturnsFeaturedAndSections(): void
     {
+        $featured = [
+            'id' => 9,
+            'slug' => 'latest',
+            'title' => 'Latest',
+        ];
         $sections = [
             [
                 'category' => ['id' => 1, 'name' => 'Новости', 'slug' => 'news'],
@@ -19,14 +25,38 @@ final class HomeServiceTest extends TestCase
             ],
         ];
 
-        $repository = $this->createMock(CategoryRepositoryInterface::class);
-        $repository->expects(self::once())
+        $categories = $this->createMock(CategoryRepositoryInterface::class);
+        $categories->expects(self::once())
             ->method('listWithLatestArticles')
             ->with(3)
             ->willReturn($sections);
 
-        $service = new HomeService($repository);
+        $articles = $this->createMock(ArticleRepositoryInterface::class);
+        $articles->expects(self::once())
+            ->method('findLatest')
+            ->willReturn($featured);
 
-        self::assertSame(['sections' => $sections], $service->getHomeData());
+        $service = new HomeService($categories, $articles);
+
+        self::assertSame([
+            'featured' => $featured,
+            'sections' => $sections,
+        ], $service->getHomeData());
+    }
+
+    public function testFeaturedCanBeNull(): void
+    {
+        $categories = $this->createMock(CategoryRepositoryInterface::class);
+        $categories->method('listWithLatestArticles')->willReturn([]);
+
+        $articles = $this->createMock(ArticleRepositoryInterface::class);
+        $articles->method('findLatest')->willReturn(null);
+
+        $service = new HomeService($categories, $articles);
+
+        self::assertSame([
+            'featured' => null,
+            'sections' => [],
+        ], $service->getHomeData());
     }
 }

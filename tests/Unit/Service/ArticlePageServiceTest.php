@@ -33,6 +33,7 @@ final class ArticlePageServiceTest extends TestCase
             'slug' => 'demo-article',
             'title' => 'Demo',
             'views' => 10,
+            'content' => "First paragraph.\n\nSecond paragraph.",
         ];
         $categories = [['id' => 1, 'slug' => 'news', 'name' => 'Новости']];
         $related = [['id' => 8, 'slug' => 'other', 'title' => 'Other']];
@@ -58,7 +59,61 @@ final class ArticlePageServiceTest extends TestCase
         $result = $service->getArticlePage('demo-article');
 
         self::assertSame(11, $result['article']['views']);
+        self::assertSame(['First paragraph.', 'Second paragraph.'], $result['article']['paragraphs']);
         self::assertSame($categories, $result['categories']);
+        self::assertSame($categories[0], $result['context_category']);
         self::assertSame($related, $result['related']);
+    }
+
+    public function testUsesFromCategoryWhenArticleBelongsToIt(): void
+    {
+        $article = [
+            'id' => 7,
+            'slug' => 'demo-article',
+            'title' => 'Demo',
+            'views' => 3,
+            'content' => 'Only one paragraph.',
+        ];
+        $categories = [
+            ['id' => 1, 'slug' => 'news', 'name' => 'Новости'],
+            ['id' => 2, 'slug' => 'tips', 'name' => 'Советы'],
+        ];
+
+        $repository = $this->createMock(ArticleRepositoryInterface::class);
+        $repository->method('findBySlug')->willReturn($article);
+        $repository->method('incrementViews');
+        $repository->method('categoriesForArticle')->willReturn($categories);
+        $repository->method('relatedBySharedCategories')->willReturn([]);
+
+        $service = new ArticlePageService($repository);
+        $result = $service->getArticlePage('demo-article', 'tips');
+
+        self::assertSame('tips', $result['context_category']['slug']);
+    }
+
+    public function testIgnoresUnknownFromCategory(): void
+    {
+        $article = [
+            'id' => 7,
+            'slug' => 'demo-article',
+            'title' => 'Demo',
+            'views' => 3,
+            'content' => 'Only one paragraph.',
+        ];
+        $categories = [
+            ['id' => 1, 'slug' => 'news', 'name' => 'Новости'],
+            ['id' => 2, 'slug' => 'tips', 'name' => 'Советы'],
+        ];
+
+        $repository = $this->createMock(ArticleRepositoryInterface::class);
+        $repository->method('findBySlug')->willReturn($article);
+        $repository->method('incrementViews');
+        $repository->method('categoriesForArticle')->willReturn($categories);
+        $repository->method('relatedBySharedCategories')->willReturn([]);
+
+        $service = new ArticlePageService($repository);
+        $result = $service->getArticlePage('demo-article', 'reviews');
+
+        self::assertSame('news', $result['context_category']['slug']);
     }
 }

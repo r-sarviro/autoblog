@@ -18,7 +18,7 @@
 - **140 связей** article ↔ category
 - Много статей в 2 категориях сразу
 - Пагинация: Новости 36, Советы 33, Обзоры 26, Технологии 25, Электромобили 20
-- **`content`** — развёрнутый plain text (~15 абзацев); в Smarty: `{$article.content|escape|nl2br}`
+- **`content`** — plain text из 5 связных абзацев (`\n\n`); в сервисе режется в `paragraphs`, в Smarty: `<p>{$paragraph|escape}</p>`
 
 ## Импорт через MySQL
 

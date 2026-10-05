@@ -20,9 +20,9 @@ final class Config
 
     public static function perPage(): int
     {
-        $perPage = Env::getInt('PER_PAGE', 10);
+        $perPage = Env::getInt('PER_PAGE', 12);
 
-        return $perPage > 0 ? $perPage : 10;
+        return $perPage > 0 ? $perPage : 12;
     }
 
     public static function isDebug(): bool
@@ -38,5 +38,10 @@ final class Config
     public static function appEnv(): string
     {
         return Env::get('APP_ENV', 'local') ?? 'local';
+    }
+
+    public static function appUrl(): string
+    {
+        return rtrim(Env::get('APP_URL', 'http://localhost:8080') ?? 'http://localhost:8080', '/');
     }
 }

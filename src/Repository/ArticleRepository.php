@@ -28,6 +28,20 @@ final class ArticleRepository implements ArticleRepositoryInterface
         return $row === false ? null : $row;
     }
 
+    /** @return array<string, mixed>|null */
+    public function findLatest(): ?array
+    {
+        $stmt = $this->pdo->query(
+            'SELECT id, image, title, description, content, views, published_at, slug, created_at, updated_at
+             FROM articles
+             ORDER BY published_at DESC, id DESC
+             LIMIT 1'
+        );
+        $row = $stmt->fetch();
+
+        return $row === false ? null : $row;
+    }
+
     public function countByCategoryId(int $categoryId): int
     {
         $stmt = $this->pdo->prepare(

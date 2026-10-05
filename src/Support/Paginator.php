@@ -74,7 +74,42 @@ final class Paginator
         return $this->hasNext() ? $this->page + 1 : null;
     }
 
-    /** @return array<string, int|bool|null> */
+    /**
+     * Compact page list with ellipsis markers for long ranges.
+     *
+     * @return list<int|string>
+     */
+    public function pages(): array
+    {
+        $total = $this->totalPages;
+        $current = $this->page;
+
+        if ($total <= 7) {
+            return range(1, $total);
+        }
+
+        $pages = [1];
+        $left = max(2, $current - 1);
+        $right = min($total - 1, $current + 1);
+
+        if ($left > 2) {
+            $pages[] = 'ellipsis';
+        }
+
+        for ($i = $left; $i <= $right; $i++) {
+            $pages[] = $i;
+        }
+
+        if ($right < $total - 1) {
+            $pages[] = 'ellipsis';
+        }
+
+        $pages[] = $total;
+
+        return $pages;
+    }
+
+    /** @return array<string, int|bool|null|list<int|string>> */
     public function toArray(): array
     {
         return [
@@ -86,6 +121,7 @@ final class Paginator
             'has_next' => $this->hasNext(),
             'previous_page' => $this->previousPage(),
             'next_page' => $this->nextPage(),
+            'pages' => $this->pages(),
         ];
     }
 }

@@ -28,6 +28,25 @@ final class CategoryRepository implements CategoryRepositoryInterface
     }
 
     /**
+     * @return list<array{id: int|string, name: string, slug: string}>
+     */
+    public function listNavCategories(): array
+    {
+        $stmt = $this->pdo->query(
+            'SELECT c.id, c.name, c.slug
+             FROM categories c
+             WHERE EXISTS (
+                 SELECT 1
+                 FROM article_category ac
+                 WHERE ac.category_id = c.id
+             )
+             ORDER BY c.name ASC'
+        );
+
+        return $stmt->fetchAll();
+    }
+
+    /**
      * Categories that have at least one article, each with up to 3 latest articles.
      *
      * @return list<array{category: array<string, mixed>, articles: list<array<string, mixed>>}>

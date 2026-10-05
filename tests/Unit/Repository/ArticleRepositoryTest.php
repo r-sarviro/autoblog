@@ -65,4 +65,23 @@ final class ArticleRepositoryTest extends TestCase
 
         self::assertNull($repository->findBySlug('missing'));
     }
+
+    public function testFindLatestReturnsNullWhenEmpty(): void
+    {
+        $statement = $this->createMock(PDOStatement::class);
+        $statement->method('fetch')->willReturn(false);
+
+        $pdo = $this->createMock(PDO::class);
+        $pdo->expects(self::once())
+            ->method('query')
+            ->with(self::callback(static function (string $sql): bool {
+                return str_contains($sql, 'ORDER BY published_at DESC')
+                    && str_contains($sql, 'LIMIT 1');
+            }))
+            ->willReturn($statement);
+
+        $repository = new ArticleRepository($pdo);
+
+        self::assertNull($repository->findLatest());
+    }
 }
