@@ -29,13 +29,16 @@ return [
     'home.lead' => 'Reviews, news and practical tips about cars.',
     'home.read' => 'Read article',
     'home.all_articles' => 'All articles',
+    'home.empty_title' => 'Empty',
     'home.empty_categories' => 'No published categories yet.',
     'home.views' => ':count views',
 
     'category.sort' => 'Sort by',
     'category.sort_date' => 'By date',
     'category.sort_views' => 'By views',
-    'category.empty' => 'No articles in this category yet.',
+    'category.empty_eyebrow' => 'Category',
+    'category.empty_title' => 'Empty',
+    'category.empty' => 'No published articles yet.',
 
     'article.views' => ':count views',
     'article.views_short' => ':count views',

@@ -1,6 +1,15 @@
 {extends file='layouts/main.tpl'}
 
 {block name='content'}
+{if $sections|@count == 0 && !$featured}
+<div class="container">
+    <section class="error-page reveal">
+        <img class="error-page__icon" src="/favicon.svg" alt="" width="48" height="48">
+        <h1>{$t['home.empty_title']}</h1>
+        <p>{$t['home.empty_categories']}</p>
+    </section>
+</div>
+{else}
 {if $featured}
 <section class="featured-hero reveal">
     <div class="featured-hero__media">
@@ -34,9 +43,6 @@
 {/if}
 
 <div class="container home-sections">
-{if $sections|@count == 0}
-    <p class="empty-state reveal">{$t['home.empty_categories']}</p>
-{else}
     {foreach from=$sections item=section}
         <section class="category-section reveal">
             <div class="section-heading">
@@ -54,6 +60,6 @@
             </div>
         </section>
     {/foreach}
-{/if}
 </div>
+{/if}
 {/block}

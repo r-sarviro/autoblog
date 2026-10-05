@@ -29,13 +29,16 @@ return [
     'home.lead' => 'Обзоры, новости и практические советы об автомобилях.',
     'home.read' => 'Читать материал',
     'home.all_articles' => 'Все статьи',
+    'home.empty_title' => 'Пусто',
     'home.empty_categories' => 'Пока нет опубликованных категорий.',
     'home.views' => ':count просмотров',
 
     'category.sort' => 'Сортировка',
     'category.sort_date' => 'По дате',
     'category.sort_views' => 'По просмотрам',
-    'category.empty' => 'В этой категории пока нет статей.',
+    'category.empty_eyebrow' => 'Категория',
+    'category.empty_title' => 'Пусто',
+    'category.empty' => 'Пока нет опубликованных статей.',
 
     'article.views' => ':count просмотров',
     'article.views_short' => ':count просм.',
