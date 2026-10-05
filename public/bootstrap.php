@@ -6,7 +6,6 @@ use App\Config\Config;
 use App\Config\Env;
 use App\Database\Database;
 use App\View\SmartyView;
-use PDO;
 
 $projectRoot = dirname(__DIR__);
 
