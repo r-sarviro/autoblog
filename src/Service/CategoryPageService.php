@@ -6,6 +6,7 @@ namespace App\Service;
 
 use App\Config\Config;
 use App\Http\NotFoundException;
+use App\I18n\Translator;
 use App\Repository\ArticleRepositoryInterface;
 use App\Repository\CategoryRepositoryInterface;
 use App\Support\Paginator;
@@ -32,7 +33,7 @@ final class CategoryPageService
         $category = $this->categories->findBySlug($slug);
 
         if ($category === null) {
-            throw new NotFoundException('Категория не найдена.');
+            throw new NotFoundException(Translator::get('error.category_not_found'));
         }
 
         $resolvedSort = SortWhitelist::resolve($sort);

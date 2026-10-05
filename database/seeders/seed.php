@@ -34,9 +34,10 @@ try {
 $pdo = Database::connection();
 
 try {
-    // DELETE (not TRUNCATE): MySQL TRUNCATE/ALTER cause implicit commits and break PDO transactions.
     $pdo->exec('SET FOREIGN_KEY_CHECKS = 0');
     $pdo->exec('DELETE FROM article_category');
+    $pdo->exec('DELETE FROM article_translations');
+    $pdo->exec('DELETE FROM category_translations');
     $pdo->exec('DELETE FROM articles');
     $pdo->exec('DELETE FROM categories');
     $pdo->exec('SET FOREIGN_KEY_CHECKS = 1');
@@ -44,29 +45,45 @@ try {
     $pdo->beginTransaction();
 
     $categoryStmt = $pdo->prepare(
-        'INSERT INTO categories (id, name, description, slug, created_at, updated_at)
-         VALUES (:id, :name, :description, :slug, :created_at, :updated_at)'
+        'INSERT INTO categories (id, slug, created_at, updated_at)
+         VALUES (:id, :slug, :created_at, :updated_at)'
+    );
+    $categoryTranslationStmt = $pdo->prepare(
+        'INSERT INTO category_translations (category_id, locale, name, description)
+         VALUES (:category_id, :locale, :name, :description)'
     );
 
     foreach ($data['categories'] as $category) {
         $categoryStmt->execute([
             'id' => $category['id'],
-            'name' => $category['name'],
-            'description' => $category['description'],
             'slug' => $category['slug'],
             'created_at' => $category['created_at'],
             'updated_at' => $category['updated_at'],
         ]);
+
+        /** @var array<string, array{name: string, description: string}> $translations */
+        $translations = $category['translations'] ?? [];
+        foreach ($translations as $locale => $fields) {
+            $categoryTranslationStmt->execute([
+                'category_id' => $category['id'],
+                'locale' => $locale,
+                'name' => $fields['name'],
+                'description' => $fields['description'],
+            ]);
+        }
     }
 
     $articleStmt = $pdo->prepare(
         'INSERT INTO articles (
-            id, image, title, description, content, views, published_at, slug, created_at, updated_at
+            id, image, views, published_at, slug, created_at, updated_at
          ) VALUES (
-            :id, :image, :title, :description, :content, :views, :published_at, :slug, :created_at, :updated_at
+            :id, :image, :views, :published_at, :slug, :created_at, :updated_at
          )'
     );
-
+    $articleTranslationStmt = $pdo->prepare(
+        'INSERT INTO article_translations (article_id, locale, title, description, content)
+         VALUES (:article_id, :locale, :title, :description, :content)'
+    );
     $linkStmt = $pdo->prepare(
         'INSERT INTO article_category (article_id, category_id)
          VALUES (:article_id, :category_id)'
@@ -76,15 +93,24 @@ try {
         $articleStmt->execute([
             'id' => $article['id'],
             'image' => $article['image'],
-            'title' => $article['title'],
-            'description' => $article['description'],
-            'content' => $article['content'],
             'views' => $article['views'],
             'published_at' => $article['published_at'],
             'slug' => $article['slug'],
             'created_at' => $article['created_at'],
             'updated_at' => $article['updated_at'],
         ]);
+
+        /** @var array<string, array{title: string, description: string, content: string}> $translations */
+        $translations = $article['translations'] ?? [];
+        foreach ($translations as $locale => $fields) {
+            $articleTranslationStmt->execute([
+                'article_id' => $article['id'],
+                'locale' => $locale,
+                'title' => $fields['title'],
+                'description' => $fields['description'],
+                'content' => $fields['content'],
+            ]);
+        }
 
         /** @var list<int> $categoryIds */
         $categoryIds = $article['category_ids'];
@@ -114,10 +140,14 @@ try {
 $categoryCount = (int) $pdo->query('SELECT COUNT(*) FROM categories')->fetchColumn();
 $articleCount = (int) $pdo->query('SELECT COUNT(*) FROM articles')->fetchColumn();
 $linkCount = (int) $pdo->query('SELECT COUNT(*) FROM article_category')->fetchColumn();
+$categoryTrCount = (int) $pdo->query('SELECT COUNT(*) FROM category_translations')->fetchColumn();
+$articleTrCount = (int) $pdo->query('SELECT COUNT(*) FROM article_translations')->fetchColumn();
 
 fwrite(STDOUT, sprintf(
-    "Seed completed: %d categories, %d articles, %d links.\n",
+    "Seed completed: %d categories, %d articles, %d links, %d category translations, %d article translations.\n",
     $categoryCount,
     $articleCount,
-    $linkCount
+    $linkCount,
+    $categoryTrCount,
+    $articleTrCount
 ));

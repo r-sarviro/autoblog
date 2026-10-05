@@ -1,11 +1,11 @@
 {if $pagination.total_items > 0 && $pagination.total_pages > 1}
-<nav class="pagination" aria-label="Пагинация">
+<nav class="pagination" aria-label="{$t['a11y.pagination']}">
     {if $pagination.has_previous}
-        <a class="pagination__nav" href="?slug={$category.slug|escape:'url'}&amp;sort={$sort|escape:'url'}&amp;page={$pagination.previous_page}" rel="prev" aria-label="Предыдущая страница">
+        <a class="pagination__nav" href="?slug={$category.slug|escape:'url'}&amp;sort={$sort|escape:'url'}&amp;page={$pagination.previous_page}" rel="prev" aria-label="{$t['a11y.prev_page']}">
             <span aria-hidden="true">←</span>
         </a>
     {else}
-        <span class="pagination__nav pagination__nav--disabled" aria-disabled="true" aria-label="Предыдущая страница">
+        <span class="pagination__nav pagination__nav--disabled" aria-disabled="true" aria-label="{$t['a11y.prev_page']}">
             <span aria-hidden="true">←</span>
         </span>
     {/if}
@@ -25,11 +25,11 @@
     </ol>
 
     {if $pagination.has_next}
-        <a class="pagination__nav" href="?slug={$category.slug|escape:'url'}&amp;sort={$sort|escape:'url'}&amp;page={$pagination.next_page}" rel="next" aria-label="Следующая страница">
+        <a class="pagination__nav" href="?slug={$category.slug|escape:'url'}&amp;sort={$sort|escape:'url'}&amp;page={$pagination.next_page}" rel="next" aria-label="{$t['a11y.next_page']}">
             <span aria-hidden="true">→</span>
         </a>
     {else}
-        <span class="pagination__nav pagination__nav--disabled" aria-disabled="true" aria-label="Следующая страница">
+        <span class="pagination__nav pagination__nav--disabled" aria-disabled="true" aria-label="{$t['a11y.next_page']}">
             <span aria-hidden="true">→</span>
         </span>
     {/if}

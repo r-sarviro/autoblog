@@ -3,9 +3,9 @@
 {block name='content'}
 <div class="container">
     {include file='partials/breadcrumbs.tpl'
-        back_url='/'
+        back_url=$url_home
         breadcrumbs=[
-            ['label' => 'Главная', 'url' => '/'],
+            ['label' => $t['nav.home'], 'url' => $url_home],
             ['label' => $category.name]
         ]
     }
@@ -15,22 +15,22 @@
         <p class="lead">{$category.description}</p>
     </section>
 
-    <div class="toolbar reveal" role="group" aria-label="Сортировка статей">
-        <span class="toolbar__label">Сортировка</span>
+    <div class="toolbar reveal" role="group" aria-label="{$t['a11y.sort']}">
+        <span class="toolbar__label">{$t['category.sort']}</span>
         <a
             class="chip{if $sort == 'date'} chip--active{/if}"
             href="?slug={$category.slug|escape:'url'}&amp;sort=date&amp;page=1"
             {if $sort == 'date'}aria-current="page"{/if}
-        >По дате</a>
+        >{$t['category.sort_date']}</a>
         <a
             class="chip{if $sort == 'views'} chip--active{/if}"
             href="?slug={$category.slug|escape:'url'}&amp;sort=views&amp;page=1"
             {if $sort == 'views'}aria-current="page"{/if}
-        >По просмотрам</a>
+        >{$t['category.sort_views']}</a>
     </div>
 
     {if $articles|@count == 0}
-        <p class="empty-state reveal">В этой категории пока нет статей.</p>
+        <p class="empty-state reveal">{$t['category.empty']}</p>
     {else}
         <div class="article-grid reveal">
             {foreach from=$articles item=article}

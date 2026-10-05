@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use App\Http\NotFoundException;
 use App\Http\Response;
+use App\I18n\Translator;
 use App\Repository\ArticleRepository;
 use App\Repository\CategoryRepository;
 use App\Service\CategoryPageService;
@@ -22,7 +23,7 @@ try {
     $slug = $request->string('slug');
 
     if ($slug === null) {
-        throw new NotFoundException('Категория не найдена.');
+        throw new NotFoundException(Translator::get('error.category_not_found'));
     }
 
     $pdo = ($app['pdo'])();

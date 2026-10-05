@@ -1,7 +1,7 @@
 {if isset($breadcrumbs) && $breadcrumbs|@count > 0}
-<nav class="breadcrumbs" aria-label="Хлебные крошки">
+<nav class="breadcrumbs" aria-label="{$t['a11y.breadcrumbs']}">
     {if isset($back_url) && $back_url != ''}
-        <a class="breadcrumbs__back" href="{$back_url}">← Назад</a>
+        <a class="breadcrumbs__back" href="{$back_url}">{$t['a11y.back']}</a>
     {/if}
     <ol class="breadcrumbs__list">
         {foreach from=$breadcrumbs item=crumb name=crumbs}

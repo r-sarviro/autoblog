@@ -20,22 +20,22 @@
             <p class="featured-hero__lead">{$featured.description}</p>
             <div class="featured-hero__meta">
                 <time datetime="{$featured.published_at}">{$featured.published_at|date_format:'%d.%m.%Y'}</time>
-                <span>{$featured.views} просмотров</span>
+                <span>{$t['home.views']|replace:':count':$featured.views}</span>
             </div>
-            <a class="button" href="/article.php?slug={$featured.slug|escape:'url'}">Читать материал</a>
+            <a class="button" href="{$url_prefix}/article.php?slug={$featured.slug|escape:'url'}">{$t['home.read']}</a>
         </div>
     </div>
 </section>
 {else}
 <section class="page-hero container reveal">
     <h1>{$app_name}</h1>
-    <p class="lead">Обзоры, новости и практические советы об автомобилях.</p>
+    <p class="lead">{$t['home.lead']}</p>
 </section>
 {/if}
 
 <div class="container home-sections">
 {if $sections|@count == 0}
-    <p class="empty-state reveal">Пока нет опубликованных категорий.</p>
+    <p class="empty-state reveal">{$t['home.empty_categories']}</p>
 {else}
     {foreach from=$sections item=section}
         <section class="category-section reveal">
@@ -44,7 +44,7 @@
                     <h2>{$section.category.name}</h2>
                     <p>{$section.category.description}</p>
                 </div>
-                <a class="button button--ghost" href="/category.php?slug={$section.category.slug|escape:'url'}">Все статьи</a>
+                <a class="button button--ghost" href="{$url_prefix}/category.php?slug={$section.category.slug|escape:'url'}">{$t['home.all_articles']}</a>
             </div>
 
             <div class="article-grid">

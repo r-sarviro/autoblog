@@ -5,6 +5,8 @@ declare(strict_types=1);
 use App\Config\Config;
 use App\Repository\ArticleRepository;
 use App\Repository\CategoryRepository;
+use App\Support\Locale;
+use App\Support\Url;
 
 /** @var array{root: string, pdo: callable, view: callable} $app */
 $app = require __DIR__ . '/bootstrap.php';
@@ -14,32 +16,48 @@ try {
     $categories = new CategoryRepository($pdo);
     $articles = new ArticleRepository($pdo);
 
-    $baseUrl = Config::appUrl();
     $urls = [];
 
-    $urls[] = [
-        'loc' => $baseUrl . '/',
-        'lastmod' => null,
-    ];
-
-    foreach ($categories->listAllForSitemap() as $category) {
+    foreach ([Locale::RU, Locale::EN] as $locale) {
         $urls[] = [
-            'loc' => $baseUrl . '/category.php?slug=' . rawurlencode($category['slug']),
-            'lastmod' => $category['lastmod'],
+            'loc' => Url::absolute('/', [], $locale),
+            'lastmod' => null,
+            'alternates' => [
+                Locale::RU => Url::absolute('/', [], Locale::RU),
+                Locale::EN => Url::absolute('/', [], Locale::EN),
+            ],
         ];
-    }
 
-    foreach ($articles->listAllForSitemap() as $article) {
-        $urls[] = [
-            'loc' => $baseUrl . '/article.php?slug=' . rawurlencode($article['slug']),
-            'lastmod' => $article['lastmod'],
-        ];
+        foreach ($categories->listAllForSitemap() as $category) {
+            $query = ['slug' => $category['slug']];
+            $urls[] = [
+                'loc' => Url::absolute('/category.php', $query, $locale),
+                'lastmod' => $category['lastmod'],
+                'alternates' => [
+                    Locale::RU => Url::absolute('/category.php', $query, Locale::RU),
+                    Locale::EN => Url::absolute('/category.php', $query, Locale::EN),
+                ],
+            ];
+        }
+
+        foreach ($articles->listAllForSitemap() as $article) {
+            $query = ['slug' => $article['slug']];
+            $urls[] = [
+                'loc' => Url::absolute('/article.php', $query, $locale),
+                'lastmod' => $article['lastmod'],
+                'alternates' => [
+                    Locale::RU => Url::absolute('/article.php', $query, Locale::RU),
+                    Locale::EN => Url::absolute('/article.php', $query, Locale::EN),
+                ],
+            ];
+        }
     }
 
     header('Content-Type: application/xml; charset=UTF-8');
 
     echo '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
-    echo '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' . "\n";
+    echo '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"'
+        . ' xmlns:xhtml="http://www.w3.org/1999/xhtml">' . "\n";
 
     foreach ($urls as $url) {
         echo "  <url>\n";
@@ -50,6 +68,16 @@ try {
                 echo '    <lastmod>' . date('Y-m-d', $timestamp) . "</lastmod>\n";
             }
         }
+        foreach ($url['alternates'] as $hreflang => $href) {
+            echo '    <xhtml:link rel="alternate" hreflang="'
+                . htmlspecialchars($hreflang, ENT_XML1 | ENT_QUOTES, 'UTF-8')
+                . '" href="'
+                . htmlspecialchars($href, ENT_XML1 | ENT_QUOTES, 'UTF-8')
+                . "\"/>\n";
+        }
+        echo '    <xhtml:link rel="alternate" hreflang="x-default" href="'
+            . htmlspecialchars($url['alternates'][Locale::RU], ENT_XML1 | ENT_QUOTES, 'UTF-8')
+            . "\"/>\n";
         echo "  </url>\n";
     }
 

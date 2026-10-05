@@ -1,53 +1,39 @@
 # Демо-данные AUTO-BLOG
 
-Набор моковых данных по модели из `blog_requirements.md`.
+Набор моковых данных по модели блога с локалями `ru` / `en`.
 
 ## Файлы
 
 | Файл | Назначение |
 |------|------------|
-| `seed_data.json` | Основной источник: категории, статьи, `category_ids` |
-| `seed_data.sql` | Готовый SQL-импорт (TRUNCATE + INSERT) |
+| `seed_data.json` | Основной источник: категории, статьи, переводы, `category_ids` |
 | `article_category.json` | Отдельная таблица связей many-to-many |
-| `../schema/schema.sql` | DDL таблиц `categories`, `articles`, `article_category` |
+| `../schema/schema.sql` | DDL: `categories`, `articles`, `*_translations`, `article_category` |
 
 ## Состав данных
 
-- **6 категорий** (у «Архив» нет статей — для проверки главной)
+- **6 категорий** (у «Архив» / Archive нет статей — для проверки главной)
 - **100 статей** с разными `published_at` и `views`
+- **Переводы** `ru` и `en` для всех категорий и статей (`translations`)
+- **Общие slug** для обеих локалей; язык выбирается префиксом `/en`
 - **140 связей** article ↔ category
-- Много статей в 2 категориях сразу
 - Пагинация: Новости 36, Советы 33, Обзоры 26, Технологии 25, Электромобили 20
-- **`content`** — plain text из 5 связных абзацев (`\n\n`); в сервисе режется в `paragraphs`, в Smarty: `<p>{$paragraph|escape}</p>`
-
-## Импорт через MySQL
-
-```bash
-mysql -u USER -p DATABASE < database/schema/schema.sql
-mysql -u USER -p DATABASE < database/seeders/data/seed_data.sql
-```
+- **`content`** — plain text из 5 связных абзацев (`\n\n`)
 
 ## Импорт через PHP seed (рекомендуется)
 
-```php
-<?php
-$data = json_decode(
-    file_get_contents(__DIR__ . '/data/seed_data.json'),
-    true,
-    512,
-    JSON_THROW_ON_ERROR
-);
+```bash
+composer seed
+# или
+php database/seeders/seed.php
+```
 
-foreach ($data['categories'] as $category) {
-    // INSERT INTO categories ...
-}
+После смены схемы в Docker пересоздайте volume БД:
 
-foreach ($data['articles'] as $article) {
-    // INSERT INTO articles ... (без category_ids)
-    foreach ($article['category_ids'] as $categoryId) {
-        // INSERT INTO article_category (article_id, category_id)
-    }
-}
+```bash
+docker compose down -v
+docker compose up -d --build
+docker compose exec app php database/seeders/seed.php
 ```
 
 ## Изображения
@@ -59,6 +45,4 @@ public/assets/images/articles/
 ```
 
 - Формат: JPEG 16:9 (~1280px)
-- Единый стиль: photorealistic automotive editorial, cool blue-steel color grade
-- Сюжеты подобраны под темы статей из `seed_data.json`
 - Пути: `/assets/images/articles/*.jpg`

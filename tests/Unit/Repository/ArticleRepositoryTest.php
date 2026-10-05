@@ -5,12 +5,19 @@ declare(strict_types=1);
 namespace Tests\Unit\Repository;
 
 use App\Repository\ArticleRepository;
+use App\Support\Locale;
 use PDO;
 use PDOStatement;
 use PHPUnit\Framework\TestCase;
 
 final class ArticleRepositoryTest extends TestCase
 {
+    protected function tearDown(): void
+    {
+        Locale::reset();
+        parent::tearDown();
+    }
+
     public function testIncrementViewsUsesAtomicUpdate(): void
     {
         $statement = $this->createMock(PDOStatement::class);
@@ -35,7 +42,7 @@ final class ArticleRepositoryTest extends TestCase
     public function testListByCategoryUsesWhitelistedOrderColumn(): void
     {
         $statement = $this->createMock(PDOStatement::class);
-        $statement->expects(self::exactly(3))->method('bindValue');
+        $statement->expects(self::exactly(4))->method('bindValue');
         $statement->expects(self::once())->method('execute')->willReturn(true);
         $statement->expects(self::once())->method('fetchAll')->willReturn([]);
 
@@ -44,6 +51,7 @@ final class ArticleRepositoryTest extends TestCase
             ->method('prepare')
             ->with(self::callback(static function (string $sql): bool {
                 return str_contains($sql, 'ORDER BY a.views DESC')
+                    && str_contains($sql, 'article_translations')
                     && !str_contains($sql, 'ORDER BY a.published_at DESC');
             }))
             ->willReturn($statement);
@@ -69,13 +77,15 @@ final class ArticleRepositoryTest extends TestCase
     public function testFindLatestReturnsNullWhenEmpty(): void
     {
         $statement = $this->createMock(PDOStatement::class);
+        $statement->method('execute')->willReturn(true);
         $statement->method('fetch')->willReturn(false);
 
         $pdo = $this->createMock(PDO::class);
         $pdo->expects(self::once())
-            ->method('query')
+            ->method('prepare')
             ->with(self::callback(static function (string $sql): bool {
-                return str_contains($sql, 'ORDER BY published_at DESC')
+                return str_contains($sql, 'ORDER BY a.published_at DESC')
+                    && str_contains($sql, 'article_translations')
                     && str_contains($sql, 'LIMIT 1');
             }))
             ->willReturn($statement);

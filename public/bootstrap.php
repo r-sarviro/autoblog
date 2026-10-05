@@ -5,6 +5,8 @@ declare(strict_types=1);
 use App\Config\Config;
 use App\Config\Env;
 use App\Database\Database;
+use App\I18n\Translator;
+use App\Support\Locale;
 use App\View\SmartyView;
 
 $projectRoot = dirname(__DIR__);
@@ -12,6 +14,8 @@ $projectRoot = dirname(__DIR__);
 require_once $projectRoot . '/vendor/autoload.php';
 
 Env::load($projectRoot);
+Translator::setLangDir($projectRoot . '/lang');
+Locale::bootstrapFromRequest();
 
 if (Config::isDebug()) {
     error_reporting(E_ALL);

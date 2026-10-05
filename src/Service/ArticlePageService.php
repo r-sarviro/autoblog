@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Service;
 
 use App\Http\NotFoundException;
+use App\I18n\Translator;
 use App\Repository\ArticleRepositoryInterface;
 
 final class ArticlePageService
@@ -26,7 +27,7 @@ final class ArticlePageService
         $article = $this->articles->findBySlug($slug);
 
         if ($article === null) {
-            throw new NotFoundException('Статья не найдена.');
+            throw new NotFoundException(Translator::get('error.article_not_found'));
         }
 
         $this->articles->incrementViews((int) $article['id']);

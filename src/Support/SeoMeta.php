@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Support;
 
 use App\Config\Config;
+use App\I18n\Translator;
 
 final class SeoMeta
 {
@@ -18,6 +19,7 @@ final class SeoMeta
      *   page_description: string,
      *   canonical_url: string,
      *   robots: string,
+     *   hreflang: list<array{lang: string, href: string}>,
      *   og: array<string, string>,
      *   twitter: array<string, string>,
      *   json_ld: list<string>
@@ -25,9 +27,9 @@ final class SeoMeta
      */
     public static function home(): array
     {
-        $title = 'Главная';
-        $description = 'Обзоры, новости и практические советы об автомобилях.';
-        $url = Config::appUrl() . '/';
+        $title = Translator::get('seo.home_title');
+        $description = Translator::get('seo.home_description');
+        $url = Url::absolute('/', [], Locale::current());
         $image = self::absoluteUrl(self::DEFAULT_IMAGE);
         $siteName = Config::appName();
 
@@ -38,6 +40,8 @@ final class SeoMeta
             robots: self::ROBOTS_INDEX,
             ogType: 'website',
             image: $image,
+            hreflangPath: '/',
+            hreflangQuery: [],
             jsonLd: [
                 [
                     '@context' => 'https://schema.org',
@@ -45,6 +49,7 @@ final class SeoMeta
                     'name' => $siteName,
                     'url' => $url,
                     'description' => $description,
+                    'inLanguage' => Locale::htmlLang(),
                 ],
             ],
         );
@@ -57,6 +62,7 @@ final class SeoMeta
      *   page_description: string,
      *   canonical_url: string,
      *   robots: string,
+     *   hreflang: list<array{lang: string, href: string}>,
      *   og: array<string, string>,
      *   twitter: array<string, string>,
      *   json_ld: list<string>
@@ -65,17 +71,17 @@ final class SeoMeta
     public static function category(array $category, string $sort = 'date', int $page = 1): array
     {
         $slug = (string) ($category['slug'] ?? '');
-        $title = (string) ($category['name'] ?? 'Категория');
+        $title = (string) ($category['name'] ?? Translator::get('seo.category_fallback'));
         $description = (string) ($category['description'] ?? '');
-        $canonical = Config::appUrl() . '/category.php?slug=' . rawurlencode($slug);
-
+        $query = ['slug' => $slug];
         if ($sort !== 'date') {
-            $canonical .= '&sort=' . rawurlencode($sort);
+            $query['sort'] = $sort;
         }
         if ($page > 1) {
-            $canonical .= '&page=' . $page;
+            $query['page'] = $page;
         }
 
+        $canonical = Url::absolute('/category.php', $query, Locale::current());
         $image = self::absoluteUrl(self::DEFAULT_IMAGE);
 
         return self::build(
@@ -85,6 +91,8 @@ final class SeoMeta
             robots: self::ROBOTS_INDEX,
             ogType: 'website',
             image: $image,
+            hreflangPath: '/category.php',
+            hreflangQuery: $query,
             jsonLd: [
                 [
                     '@context' => 'https://schema.org',
@@ -92,6 +100,7 @@ final class SeoMeta
                     'name' => $title,
                     'description' => $description,
                     'url' => $canonical,
+                    'inLanguage' => Locale::htmlLang(),
                 ],
             ],
         );
@@ -105,6 +114,7 @@ final class SeoMeta
      *   page_description: string,
      *   canonical_url: string,
      *   robots: string,
+     *   hreflang: list<array{lang: string, href: string}>,
      *   og: array<string, string>,
      *   twitter: array<string, string>,
      *   json_ld: list<string>
@@ -113,9 +123,10 @@ final class SeoMeta
     public static function article(array $article, ?array $contextCategory = null): array
     {
         $slug = (string) ($article['slug'] ?? '');
-        $title = (string) ($article['title'] ?? 'Статья');
+        $title = (string) ($article['title'] ?? Translator::get('seo.article_fallback'));
         $description = (string) ($article['description'] ?? '');
-        $canonical = Config::appUrl() . '/article.php?slug=' . rawurlencode($slug);
+        $query = ['slug' => $slug];
+        $canonical = Url::absolute('/article.php', $query, Locale::current());
         $image = self::absoluteUrl((string) ($article['image'] ?? self::DEFAULT_IMAGE));
         $published = self::toIso8601((string) ($article['published_at'] ?? ''));
         $modified = self::toIso8601((string) ($article['updated_at'] ?? $article['published_at'] ?? ''));
@@ -126,6 +137,7 @@ final class SeoMeta
             'headline' => $title,
             'description' => $description,
             'image' => [$image],
+            'inLanguage' => Locale::htmlLang(),
             'mainEntityOfPage' => [
                 '@type' => 'WebPage',
                 '@id' => $canonical,
@@ -143,8 +155,8 @@ final class SeoMeta
             [
                 '@type' => 'ListItem',
                 'position' => 1,
-                'name' => 'Главная',
-                'item' => Config::appUrl() . '/',
+                'name' => Translator::get('nav.home'),
+                'item' => Url::absolute('/', [], Locale::current()),
             ],
         ];
 
@@ -155,7 +167,7 @@ final class SeoMeta
                 '@type' => 'ListItem',
                 'position' => $position,
                 'name' => (string) ($contextCategory['name'] ?? ''),
-                'item' => Config::appUrl() . '/category.php?slug=' . rawurlencode($categorySlug),
+                'item' => Url::absolute('/category.php', ['slug' => $categorySlug], Locale::current()),
             ];
             $position++;
         }
@@ -174,6 +186,8 @@ final class SeoMeta
             robots: self::ROBOTS_INDEX,
             ogType: 'article',
             image: $image,
+            hreflangPath: '/article.php',
+            hreflangQuery: $query,
             jsonLd: [
                 $articleSchema,
                 [
@@ -190,6 +204,7 @@ final class SeoMeta
      *   page_title: string,
      *   page_description: string,
      *   robots: string,
+     *   hreflang: list<array{lang: string, href: string}>,
      *   og: array<string, string>,
      *   twitter: array<string, string>,
      *   json_ld: list<string>
@@ -198,7 +213,7 @@ final class SeoMeta
     public static function error(string $title, string $description): array
     {
         $image = self::absoluteUrl(self::DEFAULT_IMAGE);
-        $url = Config::appUrl() . '/';
+        $url = Url::absolute('/', [], Locale::current());
 
         $meta = self::build(
             pageTitle: $title,
@@ -207,21 +222,25 @@ final class SeoMeta
             robots: self::ROBOTS_NOINDEX,
             ogType: 'website',
             image: $image,
+            hreflangPath: '/',
+            hreflangQuery: [],
             jsonLd: [],
         );
 
-        unset($meta['canonical_url']);
+        unset($meta['canonical_url'], $meta['hreflang']);
 
         return $meta;
     }
 
     /**
      * @param list<array<string, mixed>> $jsonLd
+     * @param array<string, scalar|null> $hreflangQuery
      * @return array{
      *   page_title: string,
      *   page_description: string,
      *   canonical_url: string,
      *   robots: string,
+     *   hreflang: list<array{lang: string, href: string}>,
      *   og: array<string, string>,
      *   twitter: array<string, string>,
      *   json_ld: list<string>
@@ -234,22 +253,32 @@ final class SeoMeta
         string $robots,
         string $ogType,
         string $image,
+        string $hreflangPath,
+        array $hreflangQuery,
         array $jsonLd,
     ): array {
         $siteName = Config::appName();
+        $locale = Locale::current();
+        $altLocale = Locale::alternateLocale();
 
         return [
             'page_title' => $pageTitle,
             'page_description' => $pageDescription,
             'canonical_url' => $canonicalUrl,
             'robots' => $robots,
+            'hreflang' => [
+                ['lang' => 'ru', 'href' => Url::absolute($hreflangPath, $hreflangQuery, Locale::RU)],
+                ['lang' => 'en', 'href' => Url::absolute($hreflangPath, $hreflangQuery, Locale::EN)],
+                ['lang' => 'x-default', 'href' => Url::absolute($hreflangPath, $hreflangQuery, Locale::RU)],
+            ],
             'og' => [
                 'type' => $ogType,
                 'title' => $pageTitle,
                 'description' => $pageDescription,
                 'url' => $canonicalUrl,
                 'image' => $image,
-                'locale' => 'ru_RU',
+                'locale' => Locale::ogLocale($locale),
+                'locale_alternate' => Locale::ogLocale($altLocale),
                 'site_name' => $siteName,
             ],
             'twitter' => [

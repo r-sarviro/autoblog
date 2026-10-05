@@ -167,7 +167,8 @@ a:hover {
 }
 
 .theme-toggle,
-.nav-toggle {
+.nav-toggle,
+.lang-toggle {
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -183,9 +184,22 @@ a:hover {
 }
 
 .theme-toggle:hover,
-.nav-toggle:hover {
+.nav-toggle:hover,
+.lang-toggle:hover {
     border-color: var(--accent);
     color: var(--accent);
+}
+
+.lang-toggle {
+    text-decoration: none;
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    line-height: 1;
+}
+
+.lang-toggle__code {
+    display: block;
 }
 
 .theme-toggle__sun,

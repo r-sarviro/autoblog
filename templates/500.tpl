@@ -3,10 +3,10 @@
 {block name='content'}
 <div class="container">
     <section class="error-page reveal">
-        <p class="eyebrow">Ошибка</p>
+        <p class="eyebrow">{$t['error.eyebrow']}</p>
         <h1>500</h1>
-        <p>{$message|default:'Внутренняя ошибка сервера'}</p>
-        <a class="button" href="/">На главную</a>
+        <p>{$message|default:$t['error.server_detail']}</p>
+        <a class="button" href="{$url_home}">{$t['error.back_home']}</a>
     </section>
 </div>
 {/block}

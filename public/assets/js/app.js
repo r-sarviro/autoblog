@@ -47,9 +47,11 @@
         }
 
         var isDark = theme === 'dark';
+        var toLight = document.body.getAttribute('data-theme-to-light') || 'Switch to light theme';
+        var toDark = document.body.getAttribute('data-theme-to-dark') || 'Switch to dark theme';
         button.setAttribute('aria-pressed', isDark ? 'true' : 'false');
-        button.setAttribute('aria-label', isDark ? 'Включить светлую тему' : 'Включить тёмную тему');
-        button.setAttribute('title', isDark ? 'Светлая тема' : 'Тёмная тема');
+        button.setAttribute('aria-label', isDark ? toLight : toDark);
+        button.setAttribute('title', isDark ? toLight : toDark);
     }
 
     function initThemeToggle() {
@@ -78,7 +80,9 @@
         function setOpen(isOpen) {
             document.body.classList.toggle('nav-open', isOpen);
             toggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
-            toggle.setAttribute('aria-label', isOpen ? 'Закрыть меню' : 'Открыть меню');
+            var openLabel = toggle.getAttribute('data-label-open') || 'Open menu';
+            var closeLabel = toggle.getAttribute('data-label-close') || 'Close menu';
+            toggle.setAttribute('aria-label', isOpen ? closeLabel : openLabel);
         }
 
         toggle.addEventListener('click', function (event) {
