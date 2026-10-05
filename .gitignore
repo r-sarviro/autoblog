@@ -1,0 +1,14 @@
+/vendor/
+.env
+/storage/cache/templates_c/*
+!/storage/cache/templates_c/.gitkeep
+/storage/cache/smarty_cache/*
+!/storage/cache/smarty_cache/.gitkeep
+.cursor/
+.DS_Store
+Thumbs.db
+*.log
+.phpunit.result.cache
+/phpunit.xml.bak
+
+blog_requirements.md
