@@ -5,11 +5,11 @@ declare(strict_types=1);
 namespace App\Service;
 
 use App\Http\NotFoundException;
-use App\Repository\ArticleRepository;
+use App\Repository\ArticleRepositoryInterface;
 
 final class ArticlePageService
 {
-    public function __construct(private ArticleRepository $articles)
+    public function __construct(private ArticleRepositoryInterface $articles)
     {
     }
 

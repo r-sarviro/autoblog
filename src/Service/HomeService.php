@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace App\Service;
 
-use App\Repository\CategoryRepository;
+use App\Repository\CategoryRepositoryInterface;
 
 final class HomeService
 {
-    public function __construct(private CategoryRepository $categories)
+    public function __construct(private CategoryRepositoryInterface $categories)
     {
     }
 

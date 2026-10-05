@@ -9,6 +9,7 @@
 Thumbs.db
 *.log
 .phpunit.result.cache
+/storage/cache/.phpunit.cache/
 /phpunit.xml.bak
 
 blog_requirements.md

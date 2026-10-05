@@ -6,16 +6,16 @@ namespace App\Service;
 
 use App\Config\Config;
 use App\Http\NotFoundException;
-use App\Repository\ArticleRepository;
-use App\Repository\CategoryRepository;
+use App\Repository\ArticleRepositoryInterface;
+use App\Repository\CategoryRepositoryInterface;
 use App\Support\Paginator;
 use App\Support\SortWhitelist;
 
 final class CategoryPageService
 {
     public function __construct(
-        private CategoryRepository $categories,
-        private ArticleRepository $articles,
+        private CategoryRepositoryInterface $categories,
+        private ArticleRepositoryInterface $articles,
     ) {
     }
 

@@ -7,7 +7,7 @@ namespace App\Repository;
 use App\Support\SortWhitelist;
 use PDO;
 
-final class ArticleRepository
+final class ArticleRepository implements ArticleRepositoryInterface
 {
     public function __construct(private PDO $pdo)
     {
