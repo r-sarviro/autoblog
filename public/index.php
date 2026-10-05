@@ -8,7 +8,6 @@ use App\Repository\ArticleRepository;
 use App\Repository\CategoryRepository;
 use App\Service\HomeService;
 use App\View\SmartyView;
-use Throwable;
 
 /** @var array{root: string, pdo: callable, view: callable} $app */
 $app = require __DIR__ . '/bootstrap.php';
