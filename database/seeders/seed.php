@@ -34,13 +34,14 @@ try {
 $pdo = Database::connection();
 
 try {
-    $pdo->beginTransaction();
-
+    // DELETE (not TRUNCATE): MySQL TRUNCATE/ALTER cause implicit commits and break PDO transactions.
     $pdo->exec('SET FOREIGN_KEY_CHECKS = 0');
-    $pdo->exec('TRUNCATE TABLE article_category');
-    $pdo->exec('TRUNCATE TABLE articles');
-    $pdo->exec('TRUNCATE TABLE categories');
+    $pdo->exec('DELETE FROM article_category');
+    $pdo->exec('DELETE FROM articles');
+    $pdo->exec('DELETE FROM categories');
     $pdo->exec('SET FOREIGN_KEY_CHECKS = 1');
+
+    $pdo->beginTransaction();
 
     $categoryStmt = $pdo->prepare(
         'INSERT INTO categories (id, name, description, slug, created_at, updated_at)
@@ -95,14 +96,12 @@ try {
         }
     }
 
-    $pdo->exec(
-        'ALTER TABLE categories AUTO_INCREMENT = ' . ((int) $pdo->query('SELECT MAX(id) FROM categories')->fetchColumn() + 1)
-    );
-    $pdo->exec(
-        'ALTER TABLE articles AUTO_INCREMENT = ' . ((int) $pdo->query('SELECT MAX(id) FROM articles')->fetchColumn() + 1)
-    );
-
     $pdo->commit();
+
+    $nextCategoryId = (int) $pdo->query('SELECT COALESCE(MAX(id), 0) + 1 FROM categories')->fetchColumn();
+    $nextArticleId = (int) $pdo->query('SELECT COALESCE(MAX(id), 0) + 1 FROM articles')->fetchColumn();
+    $pdo->exec('ALTER TABLE categories AUTO_INCREMENT = ' . $nextCategoryId);
+    $pdo->exec('ALTER TABLE articles AUTO_INCREMENT = ' . $nextArticleId);
 } catch (Throwable $throwable) {
     if ($pdo->inTransaction()) {
         $pdo->rollBack();
